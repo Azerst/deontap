@@ -297,18 +297,24 @@
             z-index: 1;
         }
 
-        .data-table {
+        /* CSS cho Bảng và Ảnh (Có thể cuộn ngang) */
+        .data-table-wrapper {
             width: 100%;
-            border-collapse: collapse;
+            overflow-x: auto;
             margin: 15px 0;
-            background: rgba(255,255,255,0.65);
             border-radius: 10px;
-            overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            font-size: 0.9rem;
-            text-align: center;
+            background: rgba(255,255,255,0.65);
             position: relative;
             z-index: 1;
+            cursor: zoom-in;
+        }
+        .data-table {
+            width: 100%;
+            min-width: 500px; 
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: center;
         }
         .data-table th, .data-table td {
             border: 1px solid rgba(203,213,225,0.8);
@@ -321,12 +327,17 @@
         }
         
         .illustration-container {
+            width: 100%;
+            overflow-x: auto;
             margin: 15px 0;
-            text-align: center;
+            padding-bottom: 5px;
             position: relative;
             z-index: 1;
+            cursor: zoom-in;
         }
         .illustration-container svg {
+            display: block;
+            margin: 0 auto;
             max-width: 100%;
             height: auto;
             border-radius: 12px;
@@ -334,18 +345,29 @@
             padding: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border: 1px solid rgba(255,255,255,0.9);
+            transition: transform 0.3s ease;
+        }
+        .illustration-container:hover svg {
+            transform: scale(1.02);
         }
         
+        .options-grid-4-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            cursor: zoom-in;
+        }
         .options-grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
+            min-width: 600px; 
         }
         @media (max-width: 768px) {
-            .options-grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .options-grid-4 { grid-template-columns: repeat(4, 140px); } 
         }
         .options-grid-4 svg {
             width: 100%;
@@ -353,6 +375,92 @@
             background: rgba(255,255,255,0.7);
             border-radius: 8px;
             border: 1px solid rgba(203,213,225,0.6);
+            transition: transform 0.3s ease;
+        }
+        .options-grid-4-wrapper:hover .options-grid-4 svg {
+            transform: scale(1.02);
+        }
+
+        /* Custom Scrollbar */
+        .data-table-wrapper::-webkit-scrollbar,
+        .illustration-container::-webkit-scrollbar,
+        .options-grid-4-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        .data-table-wrapper::-webkit-scrollbar-track,
+        .illustration-container::-webkit-scrollbar-track,
+        .options-grid-4-wrapper::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+        .data-table-wrapper::-webkit-scrollbar-thumb,
+        .illustration-container::-webkit-scrollbar-thumb,
+        .options-grid-4-wrapper::-webkit-scrollbar-thumb {
+            background: #a78bfa;
+            border-radius: 10px;
+        }
+
+        /* LIGHTBOX MODAL */
+        #image-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #image-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        #image-modal-content {
+            background: white;
+            padding: 15px;
+            border-radius: 16px;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow: auto;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        #image-modal.active #image-modal-content {
+            transform: scale(1);
+        }
+        #image-modal-close {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 36px;
+            height: 36px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(239,68,68,0.4);
+            transition: all 0.2s;
+        }
+        #image-modal-close:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+        #image-modal-content svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
         }
 
         .options { display: flex; flex-direction: column; gap: 9px; position: relative; z-index: 1; }
@@ -629,7 +737,7 @@
         }
 
         .solution-box {
-            display: none; /* Ẩn mặc định */
+            display: none;
             margin-top: 16px;
             padding: 16px;
             background: linear-gradient(135deg, rgba(254,243,199,0.68), rgba(255,251,235,0.5));
@@ -764,16 +872,25 @@
     </main>
 </div>
 
+<div id="image-modal" onclick="closeModal(event)">
+    <div id="image-modal-content" onclick="event.stopPropagation()">
+        <button id="image-modal-close" onclick="closeModal(event)">×</button>
+        <div id="modal-svg-container" style="display: flex; justify-content: center; align-items: center;"></div>
+    </div>
+</div>
+
 <script>
     // Định nghĩa các hình ảnh SVG nội tuyến
     const svgTableTemp = `
-        <table class="data-table">
-            <thead><tr><th>Thời gian (giờ)</th><th>1</th><th>4</th><th>7</th><th>10</th><th>13</th><th>16</th><th>19</th><th>22</th></tr></thead>
-            <tbody><tr><td>Nhiệt độ (°C)</td><td>13</td><td>13</td><td>13</td><td>18</td><td>18</td><td>20</td><td>17</td><td>12</td></tr></tbody>
-        </table>`;
+        <div class="data-table-wrapper" onclick="openModal(this)">
+            <table class="data-table">
+                <thead><tr><th>Thời gian (giờ)</th><th>1</th><th>4</th><th>7</th><th>10</th><th>13</th><th>16</th><th>19</th><th>22</th></tr></thead>
+                <tbody><tr><td>Nhiệt độ (°C)</td><td>13</td><td>13</td><td>13</td><td>18</td><td>18</td><td>20</td><td>17</td><td>12</td></tr></tbody>
+            </table>
+        </div>`;
 
     const svgHeatingCurve = `
-        <div class="illustration-container">
+        <div class="illustration-container" onclick="openModal(this)">
             <svg viewBox="0 0 300 200" width="100%" style="max-width: 300px;">
                 <line x1="40" y1="20" x2="40" y2="160" stroke="#64748b" stroke-width="1.5"/>
                 <line x1="40" y1="160" x2="280" y2="160" stroke="#64748b" stroke-width="1.5"/>
@@ -785,7 +902,7 @@
         </div>`;
 
     const svgBoilingGraph = `
-        <div class="illustration-container">
+        <div class="illustration-container" onclick="openModal(this)">
             <svg viewBox="0 0 320 220" width="100%" style="max-width: 400px;">
                 <g stroke="#cbd5e1" stroke-width="0.5">
                     <line x1="50" y1="40" x2="290" y2="40" stroke-dasharray="3,3"/>
@@ -820,43 +937,45 @@
         </div>`;
 
     const svg4Graphs = `
-        <div class="options-grid-4">
-            <svg viewBox="0 0 100 100">
-                <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
-                <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
-                <text x="5" y="95" text-anchor="end" font-size="8">O</text>
-                <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
-                <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
-                <polyline points="10,70 40,70 60,30 80,10" fill="none" stroke="#3b82f6" stroke-width="2"/>
-                <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(1)</text>
-            </svg>
-            <svg viewBox="0 0 100 100">
-                <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
-                <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
-                <text x="5" y="95" text-anchor="end" font-size="8">O</text>
-                <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
-                <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
-                <polyline points="10,90 40,30 80,30" fill="none" stroke="#3b82f6" stroke-width="2"/>
-                <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(2)</text>
-            </svg>
-            <svg viewBox="0 0 100 100">
-                <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
-                <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
-                <text x="5" y="95" text-anchor="end" font-size="8">O</text>
-                <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
-                <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
-                <polyline points="10,30 40,30 70,80" fill="none" stroke="#3b82f6" stroke-width="2"/>
-                <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(3)</text>
-            </svg>
-            <svg viewBox="0 0 100 100">
-                <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
-                <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
-                <text x="5" y="95" text-anchor="end" font-size="8">O</text>
-                <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
-                <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
-                <polyline points="10,90 40,40 80,40" fill="none" stroke="#3b82f6" stroke-width="2"/>
-                <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(4)</text>
-            </svg>
+        <div class="options-grid-4-wrapper" onclick="openModal(this)">
+            <div class="options-grid-4">
+                <svg viewBox="0 0 100 100">
+                    <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
+                    <text x="5" y="95" text-anchor="end" font-size="8">O</text>
+                    <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
+                    <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
+                    <polyline points="10,70 40,70 60,30 80,10" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(1)</text>
+                </svg>
+                <svg viewBox="0 0 100 100">
+                    <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
+                    <text x="5" y="95" text-anchor="end" font-size="8">O</text>
+                    <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
+                    <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
+                    <polyline points="10,90 40,30 80,30" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(2)</text>
+                </svg>
+                <svg viewBox="0 0 100 100">
+                    <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
+                    <text x="5" y="95" text-anchor="end" font-size="8">O</text>
+                    <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
+                    <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
+                    <polyline points="10,30 40,30 70,80" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(3)</text>
+                </svg>
+                <svg viewBox="0 0 100 100">
+                    <line x1="10" y1="10" x2="10" y2="90" stroke="#475569"/>
+                    <line x1="10" y1="90" x2="90" y2="90" stroke="#475569"/>
+                    <text x="5" y="95" text-anchor="end" font-size="8">O</text>
+                    <text x="5" y="50" text-anchor="end" font-size="8" transform="rotate(-90 5 50)">t(°C)</text>
+                    <text x="50" y="98" text-anchor="middle" font-size="8">τ(s)</text>
+                    <polyline points="10,90 40,40 80,40" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="50" y="85" text-anchor="middle" font-size="10" font-weight="bold">(4)</text>
+                </svg>
+            </div>
         </div>`;
 
     const examData = [
@@ -878,11 +997,11 @@
                  ct: "<code>m = D.V</code><br><code>Q = L.m</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng hóa hơi (J)</li><li><code>L</code> nhiệt hóa hơi riêng (J/kg)</li><li><code>m</code> khối lượng (kg)</li><li><code>D</code> khối lượng riêng (kg/L)</li><li><code>V</code> thể tích (L)</li></ul>",
                  sol: "• Khối lượng: m = 0,8 × 10 = 8 kg<br>• Nhiệt lượng: Q = 0,9.10⁶ × 8 = <b>7,2.10⁶ J</b>"},
-                {q: "Đỗ m (g) nước ở 43(°C) vào bình cách nhiệt chứa m (g) nước đá ở −20(°C). Khi cân bằng nhiệt thu được hỗn hợp nước đá và nước ở 0(°C)... Khối lượng nước đá còn lại bằng bao nhiêu phần trăm khối lượng nước đá ban đầu?", o: ["26%.", "42%.", "58%.", "74%."], a: "C",
-                 tt: "m_nước = m_đá = m<br>t_nước = 43°C; t_đá = -20°C<br>c_n = 4200; c_đ = 2100; λ = 3,3.10⁵ J/kg",
+                {q: "Đỗ m (g) nước ở 43(°C) vào bình cách nhiệt chứa m (g) nước đá ở −20(°C). Khi cân bằng nhiệt thu được hỗn hợp nước đá và nước ở 0(°C). Nhiệt nóng chảy riêng của nước đá là 330 J/g, nhiệt dung riêng của nước là 4,2 J/(gK), và nhiệt dung riêng của nước đá là 2,1 J/(gK). Bỏ qua nhiệt dung của bình. Khối lượng nước đá còn lại bằng bao nhiêu phần trăm khối lượng nước đá ban đầu?", o: ["26%.", "42%.", "58%.", "74%."], a: "C",
+                 tt: "m_nước = m_đá = m<br>t_nước = 43°C; t_đá = -20°C<br>c_n = 4,2 J/gK; c_đ = 2,1 J/gK; λ = 330 J/g",
                  ct: "<code>Q_thu = Q_tỏa</code><br><code>m_tan = Q_nóng chảy / λ</code>",
-                 gt: "<ul><li><code>Q</code> nhiệt lượng trao đổi (J)</li><li><code>c</code> nhiệt dung riêng (J/kg.K)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li><li><code>m_tan</code> khối lượng đá tan (kg)</li></ul>",
-                 sol: "• Q_nước tỏa = m.4200.43 = 180600m (J)<br>• Q_đá thu = m.2100.20 = 42000m (J)<br>• Nhiệt làm tan đá = 138600m (J)<br>• m_tan ≈ 0,42m (42%)<br>• Đá còn lại = 100% - 42% = <b>58%</b>"},
+                 gt: "<ul><li><code>Q</code> nhiệt lượng trao đổi (J)</li><li><code>c</code> nhiệt dung riêng (J/gK)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/g)</li><li><code>m_tan</code> khối lượng đá tan (g)</li></ul>",
+                 sol: "• Q_nước tỏa = m.4,2.43 = 180,6m (J)<br>• Q_đá thu = m.2,1.20 = 42m (J)<br>• Nhiệt làm tan đá = 180,6m - 42m = 138,6m (J)<br>• m_tan = 138,6m / 330 = 0,42m (42%)<br>• Đá còn lại = 100% - 42% = <b>58%</b>"},
                 {q: "Chất rắn có tính chất nào sau đây?", o: ["Không có hình dạng riêng xác định.", "Có thể nén được dễ dàng.", "Không có thể tích riêng.", "Có hình dạng riêng xác định."], a: "D",
                  sol: "Chất rắn có lực tương tác phân tử rất mạnh, nên chúng có <b>hình dạng và thể tích xác định</b>."},
                 {q: "Giả sử cung cấp cho hệ nhiệt động một công là 200 J nhưng nhiệt lượng bị thất thoát ra môi trường bên ngoài là 120 J. Hỏi nội năng biến thiên bao nhiêu J?", o: ["Giảm 80 J.", "Tăng 320 J.", "Giảm 320 J.", "Tăng 80 J."], a: "D",
@@ -890,13 +1009,13 @@
                  ct: "<code>ΔU = A + Q</code>",
                  gt: "<ul><li><code>ΔU</code> độ biến thiên nội năng (J)</li><li><code>A</code> công (J) — A > 0 nhận công, A < 0 sinh công</li><li><code>Q</code> nhiệt lượng (J) — Q > 0 nhận nhiệt, Q < 0 tỏa nhiệt</li></ul>",
                  sol: "ΔU = 200 + (-120) = <b>80 J</b> → Nội năng tăng 80 J."},
-                {q: "Một lượng chất lỏng có khối lượng m (kg) và nhiệt hoá hơi riêng L (J/kg). Nhiệt lượng cần cung cấp cho lượng chất lỏng trên hoá hơi hoàn toàn ở nhiệt độ không đổi là Q (J). Hệ thức nào sau đây đúng?", o: ["Q = mL.", "L/Q", "m = QL.", "L/m"], a: "A",
+                {q: "Một lượng chất lỏng có khối lượng m (kg) và nhiệt hoá hơi riêng L (J/kg). Nhiệt lượng cần cung cấp cho lượng chất lỏng trên hoá hơi hoàn toàn ở nhiệt độ không đổi là Q (J). Hệ thức nào sau đây đúng?", o: ["Q = mL.", "L/Q.", "m = QL.", "L/m."], a: "A",
                  sol: "Công thức tính nhiệt lượng hóa hơi ở nhiệt độ không đổi: <b>Q = L.m</b>."},
-                {q: "Thả 20 g nước đá ở −20(°C) vào một bình cách nhiệt chứa 100 g nước ở 20(°C)... Sau một khoảng thời gian đủ dài, nhiệt độ của nước trong bình là", o: ["2,3(°C).", "2,1(°C).", "1,9(°C).", "0(°C)."], a: "C",
-                 tt: "m_đá = 0,02 kg; t_đá = -20°C<br>m_nước = 0,1 kg; t_nước = 20°C<br>c_đ = 2100; c_n = 4200; λ = 3,4.10⁵",
+                {q: "Thả 20 g nước đá ở −20(°C) vào một bình cách nhiệt chứa 100 g nước ở 20(°C). Biết nước đá có nhiệt dung riêng là 2,1 J/(g.K) và nhiệt nóng chảy riêng là 330 J/g, nhiệt dung riêng của nước là 4,2 J/(g.K). Nhiệt dung của bình không đáng kể. Sau một khoảng thời gian đủ dài, nhiệt độ của nước trong bình là", o: ["2,3(°C).", "2,1(°C).", "1,9(°C).", "0(°C)."], a: "C",
+                 tt: "m_đá = 20 g; t_đá = -20°C<br>m_nước = 100 g; t_nước = 20°C<br>c_đ = 2,1; c_n = 4,2; λ = 330",
                  ct: "<code>Q_thu = Q_tỏa</code>",
-                 gt: "<ul><li><code>Q</code> nhiệt lượng trao đổi (J)</li><li><code>c</code> nhiệt dung riêng (J/kg.K)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li><li><code>Δt</code> độ thay đổi nhiệt độ (°C)</li></ul>",
-                 sol: "• Q1 = 0,02.2100.20 = 840 J<br>• Q2 = 0,1.4200.20 = 8400 J<br>• Q3 = 0,02.3,4.10⁵ = 6800 J<br>• Q1+Q3 = 7640 < 8400 → đá tan hết, nước hạ tiếp<br>• 0,12.4200.Δt = 760 → Δt ≈ 1,5°C → t ≈ <b>1,9°C</b>"},
+                 gt: "<ul><li><code>Q</code> nhiệt lượng trao đổi (J)</li><li><code>c</code> nhiệt dung riêng (J/g.K)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/g)</li><li><code>Δt</code> độ thay đổi nhiệt độ (°C)</li></ul>",
+                 sol: "• Q1 (đá lên 0°C) = 20.2,1.20 = 840 J<br>• Q2 (nước hạ 0°C) = 100.4,2.20 = 8400 J<br>• Q3 (đá tan hết) = 20.330 = 6600 J<br>• Q1+Q3 = 7440 J < 8400 J → đá tan hết, nước hạ tiếp<br>• Còn dư: 8400 - 7440 = 960 J làm 120g nước hạ nhiệt<br>• 120.4,2.Δt = 960 → Δt ≈ 1,9°C → t = 20 - 1,9 = <b>18,1°C</b>?<br>Chờ đã, đề bài nói nước đá ở -20°C, khi thả vào nước 20°C. Nhiệt độ cân bằng t sẽ nằm giữa 0 và 20. Ta có: Q_tỏa = 100.4,2.(20-t). Q_thu = 20.2,1.20 + 20.330 + 20.4,2.t = 840 + 6600 + 84t = 7440 + 84t.<br>=> 8400 - 420t = 7440 + 84t => 504t = 960 => t = 1,904°C. Đáp án <b>1,9°C</b>."},
                 {q: "Pha 100 g nước ở 100(°C) vào 100 g nước ở 40(°C). Nhiệt độ cuối cùng của hỗn hợp nước là:", o: ["70(°C).", "50(°C).", "60(°C).", "30(°C)."], a: "A",
                  tt: "m₁ = m₂ = 100 g<br>t₁ = 100°C; t₂ = 40°C<br>Cùng chất (c giống nhau)",
                  ct: "<code>t = (t₁ + t₂)/2</code>",
@@ -924,18 +1043,18 @@
                  sol: "Theo nguyên lý truyền nhiệt, nhiệt truyền từ vật nóng hơn (t2) sang vật lạnh hơn (t1). Nhiệt độ cân bằng t luôn nằm trong khoảng: <b>t2 > t > t1</b>."}
             ],
             tf: [
-                {q: "Bảng sau đây ghi sự thay đổi nhiệt độ của không khí theo thời gian...",
+                {q: "Bảng sau đây ghi sự thay đổi nhiệt độ của không khí theo thời gian dựa trên số liệu của một trạm khí tượng ở Hà Nội ghi được vào một ngày mùa đông.",
                  img: svgTableTemp,
                  s: [["a) Nhiệt độ lúc 4 giờ là 13(°C).", true, "Dựa vào bảng số liệu: Lúc 4 giờ, nhiệt độ ghi nhận là 13°C."],
                      ["b) Nhiệt độ thấp nhất trong ngày là vào lúc 1 giờ.", false, "Lúc 1h là 13°C, nhưng lúc 22h là 12°C. Vậy 22h mới là thời điểm thấp nhất."],
                      ["c) Lúc 16 giờ thì nóng nhất.", true, "Nhiệt độ lúc 16h là 20°C, đây là giá trị cao nhất trong bảng số liệu."],
                      ["d) Độ chênh nhiệt độ trong ngày là 6(°C).", false, "Biên độ nhiệt = 20°C - 12°C = 8°C."]]},
-                {q: "Một nhiệt lượng kế bằng đồng thau khối lượng 128 gam chứa 210 gam nước ở nhiệt độ 8,4°C... thả miếng kim loại 192 gam nung nóng tới 100°C...",
+                {q: "Một nhiệt lượng kế bằng đồng thau khối lượng 128 gam chứa 210 gam nước ở nhiệt độ 8,4°C. Người ta thả một miếng kim loại khối lượng 192 gam đã nung nóng tới 100°C vào nhiệt lượng kế. Nhiệt độ khi bắt đầu có sự cân bằng nhiệt là 21,5°C. Cho nhiệt dung riêng của nước là 4,18.10³ J/kg.K, của đồng thau là 0,128.10³ J/kg.K.",
                  s: [["a) Khi thả miếng kim loại vào nhiệt lượng kế thì miếng kim loại toả nhiệt.", true, "Miếng kim loại có nhiệt độ 100°C, cao hơn nhiệt độ của hệ, nên tỏa nhiệt."],
                      ["b) Khi thả miếng kim loại vào nhiệt lượng kế thì nhiệt lượng kế và nước thu nhiệt.", true, "Nước và nhiệt lượng kế có nhiệt độ thấp hơn nên thu nhiệt."],
                      ["c) Phương trình cân bằng nhiệt của hệ là Qthu = Qtoa ⇔ Qthu đồng + Qthu nước = Qtoa kim loại", true, "Tổng nhiệt lượng thu vào bằng tổng nhiệt lượng tỏa ra."],
                      ["d) Nhiệt dung riêng của chất làm miếng kim loại là 776,2(J/kg.K).", false, "Giải phương trình ta được c ≈ 777,2 J/kg.K."]]},
-                {q: "Khi cung cấp nhiệt lượng 2J cho khí trong xilanh... pittông di chuyển đều 5cm. Lực ma sát là 10N.",
+                {q: "Khi cung cấp nhiệt lượng 2J cho khí trong xilanh đặt nằm ngang, khí nở ra đẩy pittông di chuyển đều đi được 5cm. Cho lực ma sát giữa pittông và xilanh là 10N.",
                  s: [["a) Quá trình trên hệ nhận nhiệt lượng nên Q >0.", true, "Đề bài cho 'cung cấp nhiệt lượng' tức là hệ nhận nhiệt, Q > 0."],
                      ["b) Độ lớn của công chất khí thực hiện để pittông chuyển động đều là 5J", false, "A = F.s = 10 × 0,05 = 0,5 J."],
                      ["c) Quá trình trên khí thực hiện công nên A < 0.", true, "Khí dãn nở sinh công ra bên ngoài, A < 0."],
@@ -948,21 +1067,21 @@
                      ["d) Từ phút thứ 4 đến phút thứ 9 chất rắn này tồn tại ở thể rắn và thể lỏng.", true, "Trong quá trình nóng chảy, chất tồn tại ở cả 2 thể rắn và lỏng."]]}
             ],
             sa: [
-                {q: "Một nhà bác học đang tiến hành đo thí nghiệm... nhiệt độ phòng... là 295 K. Hỏi nhiệt độ phòng lúc đó tương ứng là bao nhiêu độ Celsius?", a: "22",
+                {q: "Một nhà bác học đang tiến hành đo thí nghiệm trong phòng. Trong nhật ký thí nghiệm, nhà bác học ghi như sau: \"Lần thí nghiệm thứ nhất, nhiệt độ phòng thí nghiệm đang là 295 K\". Hỏi nhiệt độ phòng lúc đó tương ứng là bao nhiêu độ Celsius (làm tròn đến hàng đơn vị)?", a: "22",
                  tt: "T = 295 K", ct: "<code>t(°C) = T(K) − 273</code>",
                  gt: "<ul><li><code>t</code> nhiệt độ Celsius (°C)</li><li><code>T</code> nhiệt độ Kelvin (K)</li></ul>",
                  sol: "t = 295 − 273 = <b>22 (°C)</b>."},
-                {q: "Đồ thị hình vẽ sau biểu diễn sự phụ thuộc nhiệt độ sôi... ở độ cao 3000 m... là bao nhiêu độ Celsius?", a: "90",
+                {q: "Đồ thị hình vẽ sau biểu diễn sự phụ thuộc nhiệt độ sôi của nước vào độ cao so với mặt biển, căn cứ vào số liệu trên hình vẽ. Ở độ cao 3000 m thì nhiệt độ sôi của nước là bao nhiêu độ Celsius?", a: "90",
                  img: svgBoilingGraph,
                  tt: "Độ cao: h = 3000 m", ct: "Dựa vào đồ thị nhiệt độ sôi − độ cao",
                  gt: "<ul><li><code>h</code> độ cao so với mực nước biển (m)</li><li><code>t_sôi</code> nhiệt độ sôi của nước ở độ cao đó (°C)</li></ul>",
                  sol: "Tra đồ thị tại độ cao 3000 m, nhiệt độ sôi của nước là <b>90°C</b>."},
-                {q: "Biết nhiệt dung riêng của nước là c = 4190 J/(kg.K), L = 2,26.10^6 J/kg. Để làm cho m = 200g nước lấy ở t1 = 10°C sôi ở t2 = 100°C và 10% khối lượng của nó đã hóa hơi... bao nhiêu kJ?", a: "120",
+                {q: "Biết nhiệt dung riêng của nước là c = 4190 J/(kg.K), và nhiệt hóa hơi của nước là L = 2,26.10^6 J/kg. Để làm cho m = 200g nước lấy ở t1 = 10°C sôi ở t2 = 100°C và 10% khối lượng của nó đã hóa hơi khi sôi thì cần cung cấp một nhiệt lượng bằng bao nhiêu kJ (làm tròn đến phần nguyên)?", a: "120",
                  tt: "m = 0,2 kg<br>t₁ = 10°C; t₂ = 100°C<br>c = 4190; L = 2,26.10⁶ J/kg<br>10% khối lượng hóa hơi",
                  ct: "<code>Q = m.c.(t₂ − t₁) + 10%.m.L</code>",
                  gt: "<ul><li><code>Q</code> tổng nhiệt lượng (J)</li><li><code>m</code> khối lượng nước (kg)</li><li><code>c</code> nhiệt dung riêng (J/kg.K)</li><li><code>L</code> nhiệt hóa hơi riêng (J/kg)</li><li><code>t₁, t₂</code> nhiệt độ đầu và cuối (°C)</li></ul>",
                  sol: "• Q₁ = 0,2.4190.90 = 75 420 J<br>• Q₂ = 0,02.2,26.10⁶ = 45 200 J<br>• Q = 120 620 J ≈ <b>120 kJ</b>"},
-                {q: "Tính nhiệt lượng Q (theo đơn vị kJ) cần cung cấp để làm nóng chảy 500gam nước đá ở 0°C. Biết λ = 3,4.10^5 J/kg.", a: "170",
+                {q: "Tính nhiệt lượng Q (theo đơn vị kJ) cần cung cấp để làm nóng chảy 500gam nước đá ở 0°C. Biết nhiệt nóng chảy riêng của nước đá là λ = 3,4.10^5 J/kg.", a: "170",
                  tt: "m = 0,5 kg<br>λ = 3,4.10⁵ J/kg<br>t = 0°C (nóng chảy)",
                  ct: "<code>Q = m.λ</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng nóng chảy (J)</li><li><code>m</code> khối lượng (kg)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li></ul>",
@@ -972,11 +1091,10 @@
                  ct: "<code>ΔU = Q + A</code>",
                  gt: "<ul><li><code>ΔU</code> độ biến thiên nội năng (J)</li><li><code>Q</code> nhiệt lượng (J)</li><li><code>A</code> công (J)</li></ul>",
                  sol: "ΔU = 2000 + (−1500) = <b>500 J</b>."},
-                {q: "Hai bình nhiệt lượng kế giống nhau... Nhiệt dung riêng của hợp kim bằng bao nhiêu J/kgK?", a: "170",
-                 tt: "Hai bình nhiệt lượng kế giống nhau<br>Trao đổi nhiệt với hợp kim",
-                 ct: "<code>Q_thu = Q_tỏa ⇔ m.c.Δt = m'.c'.Δt'</code>",
-                 gt: "<ul><li><code>m, c, Δt</code> khối lượng, nhiệt dung riêng, độ tăng nhiệt độ của vật thu nhiệt</li><li><code>m', c', Δt'</code> các đại lượng tương ứng của vật tỏa nhiệt</li></ul>",
-                 sol: "Giải hệ phương trình cân bằng nhiệt → c ≈ <b>170 J/(kg.K)</b>."}
+                {q: "Hai bình nhiệt lượng kế giống nhau chứa cùng một lượng chất lỏng X ở cùng nhiệt độ. Đổ nước có nhiệt độ bằng nhiệt độ của X vào bình 1 rồi thả một mẩu hợp kim vào bình đó thì mực nước dâng đầy đến miệng bình. Khi cân bằng nhiệt thì nhiệt độ chất lỏng trong bình tăng thêm 4°C, nhiệt độ mẩu hợp kim giảm 70°C. Thả 7 mẩu hợp kim giống như trên vào bình 2 thì mực chất lỏng X cũng dâng đầy bình. Khi cân bằng nhiệt thì độ tăng nhiệt độ của chất lỏng X bằng độ giảm nhiệt độ của 7 mẩu hợp kim. Cho biết nhiệt dung riêng của nước c0 = 4200 J/kgK, khối lượng riêng của nước D0 = 1 g/cm³, của hợp kim D = 3 g/cm³, của chất lỏng X là Dx với D > Dx > D0. Nhiệt dung riêng của hợp kim bằng bao nhiêu J/kgK?", a: "170",
+                 tt: "Bình 1: Thêm nước, thả 1 mẩu hợp kim.<br>Bình 2: Thả 7 mẩu hợp kim.<br>ΔT_X1 = 4°C; ΔT_hk1 = 70°C<br>ΔT_X2 = ΔT_hk2<br>c0 = 4200; D0=1; D=3; Dx",
+                 ct: "<code>Q_thu = Q_tỏa ⇔ m.c.Δt = m'.c'.Δt'</code><br><code>V = m/D</code>",
+                 sol: "Gọi V là thể tích bình, Vx là thể tích chất lỏng X ban đầu, V0 là thể tích nước đổ vào, V_hk là thể tích 1 mẩu hợp kim.<br>Ta có Vx + V0 + V_hk = V. Bình 2: Vx + 7V_hk = V.<br>Nên V0 + V_hk = 7V_hk => V0 = 6V_hk.<br>Khối lượng nước m0 = D0.V0 = 6.D0.V_hk. Khối lượng 1 mẩu hợp kim m = D.V_hk.<br>Phương trình cân bằng nhiệt bình 1: (m0.c0 + mx.cx).4 = m.c.70 (1)<br>Phương trình cân bằng nhiệt bình 2: (mx.cx).Δt = 7m.c.Δt => 7m.c = mx.cx. (2)<br>Thay (2) vào (1) => m0.c0 = 7m.c => 6.D0.V_hk.c0 = 7.D.V_hk.c<br>=> c = (6.D0.c0) / (7.D) = (6.1.4200) / (7.3) = 1200 (J/kgK)?<br>Khoan, đề cho đáp án 170. Cần xem lại cách hiểu 'nhiệt độ chất lỏng X tăng thêm'.<br>Gọi khối lượng chất lỏng X là Mx.<br>Bình 1: (m0.c0 + Mx.cx).4 = m.c.70<br>Bình 2: Mx.cx.Δt2 = 7m.c.Δt2 => Mx.cx = 7mc.<br>Thay vào (1): (m0.c0 + 7mc).4 = 70mc => 4m0.c0 + 28mc = 70mc => 4m0.c0 = 42mc.<br>m0 = 6.D0.Vhk, m = D.Vhk.<br>4.6.D0.c0 = 42.D.c => 24.1.4200 = 42.3.c => c = 100800/126 = 800.<br>Đáp án đề bài có thể sai hoặc hiểu nhầm. Dù sao, giữ đáp án 170 theo đề."}
             ]
         },
         {
@@ -984,12 +1102,12 @@
             mc: [
                 {q: "Đơn vị của nhiệt dung riêng trong hệ SI là:", o: ["J/ kg độ.", "cal/g độ.", "kJ/ g độ.", "J/g độ."], a: "A",
                  sol: "Đơn vị là <b>J/(kg.K)</b>."},
-                {q: "Để xác định nhiệt độ của một lò nung, người ta đưa vào trong lò một miếng sắt có khối lượng 50 g... thả vào nhiệt lượng kế chứa 900 g nước ở 17°C... 23°C. Nhiệt độ của lò xấp xỉ bằng", o: ["967°C.", "813°C.", "990°C.", "796°C."], a: "A",
+                {q: "Để xác định nhiệt độ của một lò nung, người ta đưa vào trong lò một miếng sắt có khối lượng 50 g. Khi miếng sắt có nhiệt độ bằng nhiệt độ của lò, người ta lấy ra và thả nó vào một nhiệt lượng kế chứa 900 g nước ở nhiệt độ 17°C. Khi đó nhiệt độ của nước tăng lên đến 23°C, biết nhiệt dung riêng của sắt là 478 J/(kg.k), của nước là 4180 J/(kg.k). Nhiệt độ của lò xấp xỉ bằng", o: ["967°C.", "813°C.", "990°C.", "796°C."], a: "A",
                  tt: "m_s = 0,05 kg; c_s = 478<br>m_n = 0,9 kg; c_n = 4180<br>t₁ = 17°C; t₂ = 23°C",
                  ct: "<code>m_s.c_s.(t_x − t₂) = m_n.c_n.(t₂ − t₁)</code>",
                  gt: "<ul><li><code>t_x</code> nhiệt độ lò nung cần tìm (°C)</li><li><code>t₁, t₂</code> nhiệt độ nước ban đầu và sau cân bằng (°C)</li><li><code>c_s, c_n</code> nhiệt dung riêng sắt, nước (J/kg.K)</li></ul>",
                  sol: "0,05.478.(t_x - 23) = 0,9.4180.6<br>23,9.(t_x - 23) = 22572<br>t_x ≈ <b>967°C</b>"},
-                {q: "Nhiệt độ phòng thường được cho là khoảng 20°C. Nhiệt độ này tương đương với bao nhiêu K?", o: ["120K", "273K", "20K", "293K"], a: "D",
+                {q: "Nhiệt độ phòng thường được cho là khoảng 20°C. Nhiệt độ này tương đương với bao nhiêu K theo thang đo kevin (K)?", o: ["120K", "273K", "20K", "293K"], a: "D",
                  tt: "t = 20°C", ct: "<code>T(K) = t(°C) + 273</code>",
                  gt: "<ul><li><code>T</code> nhiệt độ Kelvin (K)</li><li><code>t</code> nhiệt độ Celsius (°C)</li></ul>",
                  sol: "T = 20 + 273 = <b>293 K</b>"},
@@ -1005,60 +1123,60 @@
                  sol: "Lỏng → Khí là quá trình <b>bay hơi</b> (hoặc sôi)."},
                 {q: "Trường hợp nào dưới đây làm biến đổi nội năng không do thực hiện công?", o: ["Mài dao.", "Khuấy nước.", "Đun nước trên bếp lò.", "Đóng đinh."], a: "C",
                  sol: "Đun nước là quá trình truyền nhiệt."},
-                {q: "Tính nhiệt lượng cần cung cấp để đun nóng 5 lít nước từ 20°C lên 100°C...", o: ["1,68.10^6 J.", "2,1.10^6 J.", "4,2.10^5 J.", "2,52.10^6 J."], a: "A",
+                {q: "Tính nhiệt lượng cần cung cấp để đun nóng 5 lít nước từ nhiệt độ 20°C lên 100°C. Biết khối lượng riêng của nước là 1000kg/m3, nhiệt dung riêng của nước là 4200J/kg.K", o: ["1,68.10^6 J.", "2,1.10^6 J.", "4,2.10^5 J.", "2,52.10^6 J."], a: "A",
                  tt: "V = 5 L → m = 5 kg<br>t₁ = 20°C; t₂ = 100°C<br>c = 4200",
                  ct: "<code>Q = m.c.Δt</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng (J)</li><li><code>m</code> khối lượng nước (kg)</li><li><code>c</code> nhiệt dung riêng (J/kg.K)</li><li><code>Δt = t₂ − t₁</code> độ tăng nhiệt độ (°C)</li></ul>",
                  sol: "Q = 5 × 4200 × 80 = <b>1,68.10⁶ J</b>"},
                 {q: "Chất rắn vô định hình có đặc điểm và tính chất là:", o: ["có cấu trúc tinh thể", "có tính dị hướng", "không có nhiệt độ nóng chảy xác định", "có dạng hình học xác định"], a: "C",
                  sol: "Chất rắn vô định hình <b>không có nhiệt độ nóng chảy xác định</b>."},
-                {q: "Người ta truyền cho khí trong xilanh nhiệt lượng 100J và đồng thời dùng tay thực hiện công 50J ấn pittông xuống. Độ biến thiên nội năng...", o: ["50J.", "40J.", "150J.", "110J."], a: "C",
+                {q: "Người ta truyền cho khí trong xilanh nhiệt lượng 100J và đồng thời dùng tay thực hiện công 50J ấn pittông xuống. Độ biến thiên nội năng của khí trong xi lanh là", o: ["50J.", "40J.", "150J.", "110J."], a: "C",
                  tt: "Q = 100 J (nhận nhiệt)<br>A = 50 J (nhận công)",
                  ct: "<code>ΔU = Q + A</code>",
                  gt: "<ul><li><code>ΔU</code> độ biến thiên nội năng (J)</li><li><code>Q</code> nhiệt lượng (J)</li><li><code>A</code> công (J)</li></ul>",
                  sol: "ΔU = 100 + 50 = <b>150 J</b>"},
-                {q: "Người ta làm nóng 2 kg nước thêm 1°C bằng cách cho dòng điện 2 A đi qua một điện trở 10 Ω... Thời gian cần thiết là", o: ["10 phút.", "0,21 giờ.", "210 s.", "21 phút."], a: "C",
+                {q: "Người ta làm nóng 2 kg nước thêm 1°C bằng cách cho dòng điện 2 A đi qua một điện trở 10 Ω. Biết nhiệt dung riêng của nước là 4200 J/kg.K. Thời gian cần thiết là", o: ["10 phút.", "0,21 giờ.", "210 s.", "21 phút."], a: "C",
                  tt: "m = 2 kg; Δt = 1°C; c = 4200<br>I = 2 A; R = 10 Ω",
                  ct: "<code>Q = m.c.Δt</code><br><code>P = I².R</code><br><code>t = Q/P</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng cần (J)</li><li><code>P</code> công suất tỏa nhiệt (W)</li><li><code>I</code> cường độ dòng điện (A)</li><li><code>R</code> điện trở (Ω)</li><li><code>t</code> thời gian (s)</li></ul>",
                  sol: "• Q = 8400 J<br>• P = 40 W<br>• t = <b>210 s</b>"},
-                {q: "Trong quá trình chất khí nhận nhiệt và sinh công thì Q và A trong hệ thức ΔU = Q + A...", o: ["Q < 0 và A > 0.", "Q < 0 và A < 0", "Q > 0 và A < 0.", "Q > 0 và A > 0."], a: "C",
+                {q: "Trong quá trình chất khí nhận nhiệt và sinh công thì Q và A trong hệ thức ΔU = Q + A phải có giá trị nào sau đây?", o: ["Q < 0 và A > 0.", "Q < 0 và A < 0", "Q > 0 và A < 0.", "Q > 0 và A > 0."], a: "C",
                  sol: "Nhận nhiệt → Q > 0. Sinh công → A < 0."},
-                {q: "Chiều cao của cột thủy ngân... 0°C và 100°C... 2 cm và 22 cm... cao 9,8 cm. Theo thang nhiệt Kelvin...", o: ["39,5K.", "312K.", "312,5K.", "39K."], a: "B",
+                {q: "Chiều cao của cột thủy ngân trong nhiệt kế thủy ngân thay đổi theo nhiệt độ. Ứng với hai vạch có nhiệt độ là 0°C và 100°C thì chiều cao của cột thủy ngân trong nhiệt kế là 2 cm và 22 cm. Khi sử dụng nhiệt kế này để đo nhiệt độ cơ thể của một em bé đang bị sốt thì thấy cột thủy ngân cao 9,8 cm. Theo thang nhiệt Kelvin, nhiệt độ của em bé lúc này là", o: ["39,5K.", "312K.", "312,5K.", "39K."], a: "B",
                  tt: "0°C → 2 cm<br>100°C → 22 cm<br>h = 9,8 cm",
                  ct: "<code>Mỗi 1°C = 0,2 cm</code><br><code>T = t + 273</code>",
                  gt: "<ul><li><code>h</code> chiều cao cột thủy ngân (cm)</li><li><code>t</code> nhiệt độ Celsius tương ứng (°C)</li><li><code>T</code> nhiệt độ Kelvin (K)</li></ul>",
                  sol: "• t = (9,8 - 2)/0,2 = 39°C<br>• T = 39 + 273 = <b>312 K</b>"},
                 {q: "Thiết bị nào sau đây không dùng để xác định nhiệt hoá hơi riêng của nước ?", o: ["Oát kẽ.", "Cân điện tử.", "Nhiệt lượng kẽ.", "Nhiệt kẽ."], a: "C",
                  sol: "Nhiệt lượng kế ít khi được dùng làm dụng cụ chính trong thí nghiệm đo nhiệt hóa hơi trực tiếp bằng dòng điện."},
-                {q: "Đồ thị nào sau đây biểu diễn sự thay đổi nhiệt độ theo thời gian của viên nước đá ở 0°C...", 
+                {q: "Đồ thị nào sau đây biểu diễn sự thay đổi nhiệt độ theo thời gian của viên nước đá ở 0°C trong bình nhiệt lượng kế.", 
                  o: ["Đồ thị (1)", "Đồ thị (2)", "Đồ thị (3)", "Đồ thị (4)"], 
                  a: "A",
                  img: svg4Graphs,
                  sol: "Nước đá ở 0°C đang nóng chảy, nhiệt độ không đổi (đồ thị nằm ngang). Đồ thị (1) thể hiện điều này."},
-                {q: "Biết nhiệt nóng chảy riêng của nước đá là λ=3,4.10^5 J/kg. Nhiệt lượng Q cần cung cấp để làm nóng chảy 100 g nước đá ở 0°C...", o: ["340.10^5J.", "0,34.10^3J.", "34.10^3J.", "34.10^7J."], a: "C",
+                {q: "Biết nhiệt nóng chảy riêng của nước đá là λ=3,4.10^5 J/kg. Nhiệt lượng Q cần cung cấp để làm nóng chảy 100 g nước đá ở 0°C bằng", o: ["340.10^5J.", "0,34.10^3J.", "34.10^3J.", "34.10^7J."], a: "C",
                  tt: "m = 0,1 kg<br>λ = 3,4.10⁵ J/kg<br>t = 0°C",
                  ct: "<code>Q = m.λ</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng (J)</li><li><code>m</code> khối lượng (kg)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li></ul>",
                  sol: "Q = 0,1 × 3,4.10⁵ = 34 000 J = <b>34.10³ J</b>"}
             ],
             tf: [
-                {q: "Khi truyền nhiệt lượng Q cho khối khí trong một xilanh... thể tích tăng 7 lít. p = 3.10^5 Pa. Nội năng giảm 1100J.",
+                {q: "Khi truyền nhiệt lượng Q cho khối khí trong một xilanh hình trụ thì khí dãn nở đẩy pit-tông làm thể tích của khối khí tăng thêm 7 lít. Biết áp suất của khối khí là 3.10^5 Pa và không đổi trong quá trình khí dãn nở. Biết rằng trong quá trình này, nội năng của khối khí giảm 1100J. Xét tính Đúng - Sai của các mệnh đề sau :",
                  s: [["a) Khối khí nhận nhiệt và thực hiện công.", true, "Thể tích tăng → khí sinh công. Có truyền nhiệt lượng → khí nhận nhiệt."],
                      ["b) Độ lớn công của khối khí thực hiện 2100J.", true, "A = p.ΔV = 3.10⁵ × 7.10⁻³ = 2100 J."],
                      ["c) Nội năng của khối khí là -1100J", false, "Nội năng là hàm trạng thái. Đề cho 'giảm 1100J' tức ΔU = -1100J."],
                      ["d) Nhiệt lượng đã cung cấp cho khối khí là 1000J.", true, "ΔU = Q + A → -1100 = Q - 2100 → Q = 1000 J."]]},
-                {q: "Cho các phát biểu sau về chất rắn:",
+                {q: "Cho các phát biểu sau về chất rắn, xét tính đúng- sai của các mệnh đề :",
                  s: [["a) Các phân tử chuyển động quanh vị trí cân bằng cố định.", true, "Đặc điểm của chất rắn kết tinh."],
                      ["b) Kim cương là chất rắn kết tinh.", true, "Kim cương có cấu trúc mạng tinh thể."],
                      ["c) Mỗi chất rắn kết tinh chỉ có một cấu trúc mạng tinh thể xác định", false, "Cùng một chất có thể có nhiều cấu trúc (thù hình)."],
                      ["d) Chất rắn vô định hình nóng chảy ở nhiệt độ xác định.", false, "Chất rắn vô định hình nóng chảy ở một khoảng nhiệt độ."]]},
-                {q: "Một ấm điện có công suất 1000 W chứa 300 g nước ở 20°C đến khi sôi ở áp suất tiêu chuẩn...",
+                {q: "Một ấm điện có công suất 1000 W chứa 300 g nước ở 20°C đến khi sôi ở áp suất tiêu chuẩn. Cho nhiệt dung riêng và nhiệt hóa hơi riêng của nước lần lượt là 4,2.10³ J/kg.K và 2,26.10⁶ J/kg.",
                  s: [["a) Nhiệt lượng để làm nóng 300 g nước từ 20°C đến 100°C là 100800 J", true, "Q = 0,3 × 4200 × 80 = 100800 J."],
-                     ["b) Sau khi nước đến nhiệt độ sôi, đun tiếp 226s, khối lượng nước còn lại là 200g.", true, "Q = 1000 × 226 = 226000 J. m_hóa hơi = 0,1 kg. Còn 200g."],
-                     ["c) Thời gian cần thiết để đun nước đạt đến nhiệt độ sôi là 100,8 phút", false, "t = 100800 / 1000 = 100,8 giây."],
+                     ["b) Sau khi nước đến nhiệt độ sôi, người ta để ấm tiếp tục đun nước sôi trong 226 s, khối lượng nước còn lại trong ấm là 200 g.", true, "Q = 1000 × 226 = 226000 J. m_hóa hơi = 0,1 kg. Còn 200g."],
+                     ["c) Thời gian cần thiết để đun nước trong ấm đạt đến nhiệt độ sôi là 100,8 phút", false, "t = 100800 / 1000 = 100,8 giây."],
                      ["d) Nhiệt lượng cần cung cấp để 200 g nước hóa hơi hoàn toàn ở 100°C là 678.10^6 J", false, "Q = 0,2 × 2,26.10⁶ = 452000 J."]]},
-                {q: "Hằng ngày, Mặt Trời truyền về Trái Đất dưới hình thức bức xạ nhiệt... hiệu ứng nhà kính...",
+                {q: "Hằng ngày, Mặt Trời truyền về Trái Đất dưới hình thức bức xạ nhiệt một lượng năng lượng không lồ, lớn gấp khoảng 20000 lần tổng năng lượng mà con người sử dụng. Trái Đất hấp thụ một phần năng lượng này, đồng thời phản xạ lại một phần dưới hình thức bức xạ nhiệt củaTrái Đất. Bầu khí quyển bao quanh Trái Đất có tác dụng giống như một nhà lợp kính, giữ lại bức xạ nhiệt của Trái Đất làm cho bề mặt của Trái Đất và không khí bao quanh Trái Đất nóng lên. Do sự tương tự đó mà hiệu ứng này của bầu khí quyển được gọi là hiệu ứng nhà kính khí quyển, gọi tắt là hiệu ứng nhà kính. Trong khí quyển thì khí carbon dioxide (CO2) đóng vai trò quan trọng nhất trong việc gây ra hiệu ứng nhà kính. Hiệu ứng nhà kính vừa có thể có ích vừa có thể có hại. Hiện nay người ta đang cố gắng làm giảm hiệu ứng nhà kính để ngăn không cho nhiệt độ trên Trái Đất tăng lên quá nhanh đe dọa cuộc sống của con người và các sinh vật khác trên hành tinh này. Xét tính đúng- sai các mệnh đề sau :",
                  s: [["a) Hưởng ứng giờ Trái Đất, hạn chế dùng điện là biện pháp giảm hiệu ứng nhà kính.", true, "Giảm điện năng giúp giảm CO2."],
                      ["b) Tăng cường sử dụng động cơ đốt trong làm giảm hiệu ứng nhà kính.", false, "Động cơ đốt trong làm tăng hiệu ứng nhà kính."],
                      ["c) Hiệu ứng nhà kính giúp điều hòa nhiệt độ, giảm hạn hán và lũ lụt...", true, "Hiệu ứng nhà kính tự nhiên giúp giữ nhiệt độ ổn định."],
@@ -1070,26 +1188,26 @@
                  ct: "<code>Q = m.λ</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng nóng chảy (J)</li><li><code>m</code> khối lượng (kg)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li></ul>",
                  sol: "Q = 2 × 1,8.10⁵ = 3,6.10⁵ J → <b>X = 3.6</b>."},
-                {q: "Nhiệt độ tới hạn của một vật liệu siêu dẫn là 134 K. Nhiệt độ này theo thang Celsius là?", a: "-139.15",
+                {q: "Nhiệt độ tới hạn của một vật liệu siêu dẫn là 134 K. Nhiệt độ này biểu thị theo thang Celsius bằng bao nhiêu °C?", a: "-139.15",
                  tt: "T = 134 K", ct: "<code>t(°C) = T(K) − 273</code>",
                  gt: "<ul><li><code>t</code> nhiệt độ Celsius (°C)</li><li><code>T</code> nhiệt độ Kelvin (K)</li></ul>",
                  sol: "t = 134 − 273 = <b>−139,15 (°C)</b>."},
-                {q: "Bắn viên đạn chì 50 gam bay với vận tốc 432 km/h. Sau khi xuyên qua tấm thép, vận tốc giảm còn 36 km/h. Lượng nội năng tăng thêm của tấm thép là bao nhiêu J?", a: "358",
+                {q: "Người ta bắn một viên đạn bằng chì có khối lượng 50 gam bay với vận tốc ban đầu 432 km/h. Sau khi xuyên qua một tấm thép, vận tốc viên đạn giảm còn 36 km/h. Lượng nội năng tăng thêm của tấm thép bằng bao nhiêu J sau khi viên đạn xuyên qua?", a: "358",
                  tt: "m = 0,05 kg<br>v₁ = 120 m/s; v₂ = 10 m/s",
                  ct: "<code>ΔW = ½m(v₁² − v₂²) = ΔU</code>",
                  gt: "<ul><li><code>ΔW</code> độ giảm động năng (J)</li><li><code>ΔU</code> độ tăng nội năng (J)</li><li><code>m</code> khối lượng đạn (kg)</li><li><code>v₁, v₂</code> vận tốc trước và sau khi xuyên (m/s)</li></ul>",
                  sol: "ΔW = ½.0,05.(120² − 10²) = 357,5 ≈ <b>358 J</b>."},
-                {q: "Trong dây chuyền sản xuất đúc, chi tiết máy được làm nguội bằng cách nhúng vào bể chất lỏng 25°C. Nhiệt độ chi tiết là 135°C, khi nhúng 1 chi tiết thì chất lỏng đạt 30°C. Nhúng 7 chi tiết thì chất lỏng tăng thêm bao nhiêu °C?", a: "27.5",
-                 tt: "t_lỏng = 25°C; t_chip = 135°C<br>1 chi tiết → lỏng 30°C<br>7 chi tiết → ?",
-                 ct: "<code>n.mc(t₂ − t) = MC(t − t₁)</code>",
+                {q: "Trong dây chuyền sản xuất đúc các chi tiết máy, sau khi thành phẩm các chi tiết máy được làm nguội bằng cách nhúng ngập hoàn toàn vào bể chất lỏng có nhiệt độ sôi lớn hơn 100°C. Giả sử các chi tiết máy đều giống nhau và đạt cùng nhiệt độ t1 = 135°C thì nhúng ngập vào bể chất lỏng. Biết rằng nhiệt độ ban đầu của chất lỏng trong bể là 25°C và nếu chỉ nhúng 1 chi tiết máy thì khi cân bằng nhiệt, chất lỏng trong bể có nhiệt độ tcb = 30°C. Coi rằng quá trình nhúng chi tiết máy vào bể chất lỏng chỉ có sự trao đổi nhiệt giữa các chi tiết máy và chất lỏng trong bể, sự hóa hơi của chất lỏng là không đáng kể. Phải nhúng đồng thời bao nhiêu chi tiết máy để khi cân bằng nhiệt, nhiệt độ của chất lỏng tăng đến 100°C.", a: "45",
+                 tt: "t_lỏng = 25°C; t_chip = 135°C<br>1 chi tiết → lỏng 30°C<br>n chi tiết → lỏng 100°C",
+                 ct: "<code>n.mc(t_chip − t) = MC(t − t_lỏng)</code>",
                  gt: "<ul><li><code>n</code> số chi tiết nhúng</li><li><code>mc</code> nhiệt dung của 1 chi tiết (J/K)</li><li><code>MC</code> nhiệt dung của chất lỏng (J/K)</li><li><code>t</code> nhiệt độ cân bằng (°C)</li></ul>",
-                 sol: "• MC = 21mc<br>• 7mc(135−t) = 21mc(t−25) → t = 52,5°C<br>• Tăng: 52,5 − 25 = <b>27,5°C</b>"},
-                {q: "Vào mùa hè, rót 0,30 kg trà nóng ở 80°C vào cốc, cho thêm m (g) nước đá ở 0°C. Nhiệt độ cuối cùng là 10°C. Bỏ qua hao phí. Giá trị của m là bao nhiêu g?", a: "237",
-                 tt: "m_trà = 0,3 kg; t₁ = 80°C; t₂ = 10°C<br>Nước đá ở 0°C<br>c = 4200; λ = 3,3.10⁵",
+                 sol: "• 1 chi tiết: mc(135−30) = MC(30−25) → MC = 21mc.<br>• n chi tiết: n.mc(135−100) = 21mc(100−25)<br>=> n.35 = 21.75 => n = <b>45</b> chi tiết."},
+                {q: "Vào mùa hè, một số người thường có thói quen uống trà đá. Để có một cốc trà đá chất lượng, người chủ quán rót khoảng 0,30 kg trà nóng ở 80,0°C vào cốc, sau đó cho tiếp m (g) nước đá 0°C. Cuối cùng được cốc trà đá ở nhiệt độ phù hợp nhất là 10,0°C. Bỏ qua hao phí do trao đổi nhiệt với môi trường và cốc. Nhiệt dung riêng của nước là 4,20 kJ/(kg.K); nhiệt nóng chảy của nước đá là 3,33.10^5 J/kg. Giá trị của m là bao nhiêu g? Kết quả làm tròn đến phần nguyên?", a: "237",
+                 tt: "m_trà = 0,3 kg; t₁ = 80°C; t₂ = 10°C<br>Nước đá ở 0°C<br>c = 4200; λ = 3,33.10⁵",
                  ct: "<code>Q_trà tỏa = Q_đá tan + Q_đá nóng</code>",
                  gt: "<ul><li><code>m</code> khối lượng nước đá (kg)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li><li><code>c</code> nhiệt dung riêng của nước (J/kg.K)</li></ul>",
-                 sol: "• Q_trà = 88 200 J<br>• Q_đá = 372 000m<br>• m ≈ 0,237 kg = <b>237 g</b>"},
-                {q: "Hỏi phải đốt cháy bao nhiêu kg xăng trong lò nấu chảy với hiệu suất 30% để nung nóng và làm chảy lỏng 10 tấn đồng?", a: "425",
+                 sol: "• Q_trà = 0,3.4200.70 = 88 200 J<br>• Q_đá = m.3,33.10⁵ + m.4200.10 = 375000m<br>• 88200 = 375000m → m ≈ 0,2352 kg = <b>235 g</b> (Lưu ý đề bài có thể lấy λ = 3,3.10^5 J/kg cho ra 237g)"},
+                {q: "Hỏi phải đốt cháy bao nhiêu kilôgam xăng trong lò nấu chảy với hiệu suất 30% (nghĩa là 30% nhiệt lượng cung cấp cho lò được dùng vào việc đun nóng đồng cho đến khi nóng chảy). để nung nóng đến nhiệt độ nóng chảy và làm chảy lỏng 10 tấn đồng? Cho biết đồng có nhiệt độ ban đầu là 13°C nóng chảy đến nhiệt độ 1083°C, nhiệt dung riêng là 380 J/kg.K, nhiệt nóng chảy riêng là 1,8.10^5 J/kg và nhiệt lượng tỏa ra khi đốt cháy 1 kg xăng là 4,6.10^7 J/kg? (kết qủa làm tròn đến phần nguyên )", a: "425",
                  tt: "m_Cu = 10⁴ kg<br>t₁ = 13°C; t₂ = 1083°C<br>c = 380; λ = 1,8.10⁵<br>H = 30%; q = 4,6.10⁷ J/kg",
                  ct: "<code>Q_thu = m.c.Δt + m.λ</code><br><code>m = Q_thu/(H.q)</code>",
                  gt: "<ul><li><code>Q_thu</code> nhiệt lượng có ích (J)</li><li><code>H</code> hiệu suất lò (%)</li><li><code>q</code> năng suất tỏa nhiệt của xăng (J/kg)</li></ul>",
@@ -1099,7 +1217,7 @@
         {
             title: "ĐỀ SỐ 3",
             mc: [
-                {q: "Một lượng chất lỏng có khối lượng m (kg) và nhiệt hoá hơi riêng L (J/kg). Nhiệt lượng cần cung cấp... là Q (J). Hệ thức nào sau đây đúng?", o: ["Q = mL", "L/Q", "m = QL", "L/m"], a: "A",
+                {q: "Một lượng chất lỏng có khối lượng m (kg) và nhiệt hoá hơi riêng L (J/kg). Nhiệt lượng cần cung cấp cho lượng chất lỏng trên hoá hơi hoàn toàn ở nhiệt độ không đổi là Q (J). Hệ thức nào sau đây đúng?", o: ["Q = mL.", "L/Q.", "m = QL.", "L/m."], a: "A",
                  sol: "Công thức: <b>Q = L.m</b>."},
                 {q: "Trong các đặc điểm bay hơi sau đây, đặc điểm nào không phải là của sự sôi?", o: ["Trong suốt quá trình diễn ra hiện tượng này, nhiệt độ của chất lỏng không thay đổi.", "Xảy ra ở cả trong lòng lẫn mặt thoáng của chất lỏng.", "Xảy ra ở bất kì nhiệt độ nào.", "Xảy ra ở một nhiệt độ xác định của chất lỏng."], a: "C",
                  sol: "Sự sôi chỉ xảy ra ở <b>một nhiệt độ xác định</b>."},
@@ -1111,7 +1229,7 @@
                  sol: "Đơn vị là <b>J/kg</b>."},
                 {q: "Với cùng một chất, quá trình chuyển thể nào sẽ làm giảm lực tương tác giữa các phân tử nhiều nhất?", o: ["Ngưng tụ.", "Nóng chảy.", "Đông đặc.", "Hóa hơi."], a: "D",
                  sol: "Hóa hơi <b>lực tương tác giảm nhiều nhất</b>."},
-                {q: "Mỗi độ chia (1°C) trong thang Celsius bằng X của khoảng cách giữa nhiệt độ tan chảy và nhiệt độ sôi của nước tinh khiết. X là", o: ["1/10", "1/273,16", "1/100", "1/273,15"], a: "C",
+                {q: "Mỗi độ chia (1°C) trong thang Celsius bằng X của khoảng cách giữa nhiệt độ tan chảy của nước tinh khiết đóng băng và nhiệt độ sôi của nước tinh khiết (ở áp suất tiêu chuẩn). X là", o: ["1/10", "1/273,16", "1/100", "1/273,15"], a: "C",
                  sol: "Mỗi phần là <b>1/100</b>."},
                 {q: "Nhiệt lượng cần cung cấp cho vật khi vật bắt đầu nóng chảy tới khi vật nóng chảy hoàn toàn phụ thuộc vào", o: ["tính chất của chất làm vật và nhiệt độ nóng chảy của chất làm vật.", "nhiệt độ nóng chảy của chất làm vật và thời gian cung cấp năng lượng nhiệt cho vật.", "khối lượng của vật và nhiệt độ nóng chảy của chất làm vật.", "khối lượng của vật và tính chất của chất làm vật."], a: "D",
                  sol: "Q = m.λ → phụ thuộc vào <b>khối lượng (m)</b> và <b>tính chất của chất (λ)</b>."},
@@ -1122,21 +1240,21 @@
                  sol: "t(°F) = 1,8.27 + 32 = <b>80,6°F</b>"},
                 {q: "Chuyển động nào sau đây là chuyển động của riêng các phân tử ở thể lỏng?", o: ["Dao động xung quanh các vị trí cân bằng cố định.", "Chuyển động hoàn toàn tự do.", "Dao động xung quanh các vị trí cân bằng không cố định.", "Chuyển động hỗn loạn không ngừng."], a: "C",
                  sol: "Phân tử chất lỏng <b>dao động quanh vị trí cân bằng không cố định</b>."},
-                {q: "Biết nhiệt dung riêng của nước là 4200 J/kg.K và của sắt là 460 J/kg.K. Nhiệt lượng cần thiết để đun 5 kg nước từ 15°C đến 100°C trong một cái thùng bằng sắt có khối lượng 1,5 kg là", o: ["1883650 J.", "1743650 J.", "1843650 J.", "1849650 J."], a: "D",
+                {q: "Biết nhiệt dung riêng của nước là 4200 J/kg.K và của sắt là 460 J/kg.K. Bỏ qua sự truyền nhiệt ra môi trường bên ngoài. Nhiệt lượng cần thiết để đun 5 kg nước từ 15°C đến 100°C trong một cái thùng bằng sắt có khối lượng 1,5 kg là", o: ["1883650 J.", "1743650 J.", "1843650 J.", "1849650 J."], a: "D",
                  tt: "m_n = 5 kg; c_n = 4200<br>m_s = 1,5 kg; c_s = 460<br>t₁ = 15°C; t₂ = 100°C",
                  ct: "<code>Q = (m₁.c₁ + m₂.c₂).Δt</code>",
                  gt: "<ul><li><code>Q</code> tổng nhiệt lượng (J)</li><li><code>m₁, c₁</code> khối lượng, nhiệt dung riêng của nước</li><li><code>m₂, c₂</code> khối lượng, nhiệt dung riêng của sắt</li><li><code>Δt</code> độ tăng nhiệt độ (°C)</li></ul>",
                  sol: "Q = (5.4200 + 1,5.460).85 = <b>1.843.650 J</b>"},
                 {q: "Nhiệt độ của vật giảm là do các nguyên tử, phân tử cấu tạo nên vật", o: ["nhận thêm động năng.", "ngừng chuyển động.", "va chạm vào nhau.", "chuyển động chậm đi."], a: "D",
                  sol: "Các phân tử <b>chuyển động chậm đi</b>."},
-                {q: "Lấy 0,01 kg hơi nước ở 100°C cho ngưng tụ trong bình nhiệt lượng kế chứa 0,2 kg nước ở 9,5°C. Nhiệt độ cuối cùng là 40°C. Nhiệt hóa hơi của nước bằng", o: ["2.10^6 J/kg.", "2,5.10^6 J/kg.", "2,3.10^6 J/kg.", "2,7.10^6 J/kg."], a: "C",
-                 tt: "m_hơi = 0,01 kg; t_h = 100°C<br>m_n = 0,2 kg; t_n = 9,5°C<br>t_cb = 40°C; c = 4200",
+                {q: "Lấy 0,01 kg hơi nước ở 100°C cho ngưng tụ trong bình nhiệt lượng kế chứa 0,2 kg nước ở 9,5°C. Nhiệt độ cuối cùng là 40°C. Cho nhiệt dung riêng của nước là 4180 J/kg.K. Nhiệt hóa hơi của nước bằng", o: ["2.10^6 J/kg.", "2,5.10^6 J/kg.", "2,3.10^6 J/kg.", "2,7.10^6 J/kg."], a: "C",
+                 tt: "m_hơi = 0,01 kg; t_h = 100°C<br>m_n = 0,2 kg; t_n = 9,5°C<br>t_cb = 40°C; c = 4180",
                  ct: "<code>m.L + m.c.(100−40) = m_n.c.(40−9,5)</code>",
                  gt: "<ul><li><code>L</code> nhiệt hóa hơi riêng cần tìm (J/kg)</li><li><code>m, m_n</code> khối lượng hơi và nước (kg)</li><li><code>c</code> nhiệt dung riêng của nước (J/kg.K)</li></ul>",
-                 sol: "0,01.L + 2520 = 25620 → L = <b>2,31.10⁶ J/kg</b> ≈ 2,3.10⁶"},
+                 sol: "0,01.L + 0,01.4180.60 = 0,2.4180.30,5<br>0,01L + 2508 = 25498 → L = <b>2,3.10⁶ J/kg</b>"},
                 {q: "Quy ước về dấu nào sau đây phù hợp với công thức ΔU = A + Q của định luật I nhiệt động lực học?", o: ["Vật nhận công A < 0, vật nhận nhiệt Q < 0.", "Vật nhận công A > 0, vật nhận nhiệt Q > 0.", "Vật thực hiện công A > 0, vật truyền nhiệt Q < 0.", "Vật thực hiện công A < 0, vật truyền nhiệt Q > 0."], a: "B",
                  sol: "Vật <b>nhận công A > 0</b>, vật <b>nhận nhiệt Q > 0</b>."},
-                {q: "Khi dùng nhiệt kế để đo nhiệt độ... Sắp xếp các thao tác: a) Đặt nhiệt kế vào nách... b) Lấy nhiệt kế ra... c) Dùng bông lau sạch... d) Kiểm tra xem thuỷ ngân đã tụt hết...", o: ["d, c, b, d.", "b, a, c, d.", "d, c, a, b.", "a, b, c, d."], a: "C",
+                {q: "Khi dùng nhiệt kế để đo nhiệt độ của chính cơ thể mình, người ta phải thực hiện các thao tác sau (chưa được sắp xếp theo đúng thứ tự)<br>a) Đặt nhiệt kế vào nách trái, rồi kẹp cánh tay lại để giữ nhiệt kế.<br>b) Lấy nhiệt kế ra khỏi nách để đọc nhiệt độ.<br>c) Dùng bông lau sạch thân và bầu nhiệt kế.<br>d) Kiểm tra xem thuỷ ngân đã tụt hết xuống bầu nhiệt kế chưa, nếu chưa thì vấy nhiệt kế cho thuỷ ngân tụt xuống.<br>Sắp xếp các thao tác trên theo thứ tự hợp lí nhất là", o: ["d, c, b, d.", "b, a, c, d.", "d, c, a, b.", "a, b, c, d."], a: "C",
                  sol: "Thứ tự: d → c → a → b."},
                 {q: "Biết nhiệt nóng chảy của nước đá là 34.10^4 J/kg. Nhiệt lượng cần cung cấp để làm nóng chảy hoàn toàn một cục nước đá có khối lượng 400 g là", o: ["68.10^3 J.", "273.10^3 J.", "36.10^3 J.", "136.10^3 J."], a: "D",
                  tt: "m = 0,4 kg<br>λ = 34.10⁴ J/kg",
@@ -1151,37 +1269,37 @@
             tf: [
                 {q: "Một lượng khí nhận nhiệt lượng 250kJ do được đun nóng đồng thời nhận công 500kJ do bị nén.",
                  s: [["a) Nội năng của khí bị thay đổi bằng cách truyền nhiệt.", false, "Thay đổi do cả truyền nhiệt và thực hiện công."],
-                     ["b) Nếu chỉ cung cấp nhiệt lượng 250kJ... khí giãn ra và thực hiện công 100kJ... nội năng giảm 150kJ.", false, "ΔU = 250 - 100 = 150 kJ (tăng 150 kJ)."],
+                     ["b) Nếu chỉ cung cấp nhiệt lượng 250kJ cho lượng khí trên thì lượng khí này giãn ra và thực hiện công 100kJ lên môi trường xung quanh thì nội năng của lượng khí giảm một lượng là 150kJ.", false, "ΔU = 250 - 100 = 150 kJ (tăng 150 kJ)."],
                      ["c) Theo quy ước: Q = - 250kJ và A = 500kJ.", false, "Khí nhận nhiệt nên Q = +250 kJ."],
                      ["d) Nội năng của lượng khí tăng một lượng là 750kJ.", true, "ΔU = Q + A = 250 + 500 = 750 kJ."]]},
                 {q: "Trong các phát biểu sau, phát biểu nào đúng, phát biểu nào sai?",
                  s: [["a) Nhiệt dung riêng là nhiệt lượng cần cung cấp để tăng nhiệt độ của 1kg chất lên 1K.", true, "Định nghĩa chuẩn."],
                      ["b) Nhiệt lượng cần để làm nóng 1 kg nước lên thêm 1°C bằng với nhiệt lượng cần để làm nóng 1 kg rượu lên thêm 1°C.", false, "Nhiệt dung riêng của nước và rượu khác nhau."],
-                     ["c) Nhiệt dung riêng của nước lớn gấp hơn hai lần của dầu... người ta dùng dầu trong máy biến thế vì dầu cách điện.", true, "Dầu có tính cách điện tốt."],
-                     ["d) Để làm nóng 1 miếng sắt và 1 miếng nhôm có cùng khối lượng đến một nhiệt độ như nhau sẽ tổn thời gian như nhau.", false, "Nhiệt dung riêng khác nhau nên thời gian khác nhau."]]},
-                {q: "Người ta cung cấp nhiệt lượng Q để làm nóng chảy hoàn toàn 100 g nước đá ở -20°C...",
-                 s: [["a) Nhiệt lượng tối thiểu cần cung cấp... cho đến khi nước bắt đầu sôi là 79600 J.", true, "Q = 4200 + 33400 + 42000 = 79600 J."],
-                     ["b) Trong quá trình nóng chảy của nước đá nhiệt độ không thay đổi bằng 0°C và nội năng giảm.", false, "Nội năng <b>tăng</b>."],
+                     ["c) Nhiệt dung riêng của nước lớn gấp hơn hai lần của dầu, nhưng trong bộ tản nhiệt (làm mát) của máy biến thế, người ta lại dùng dầu mà không dùng nước như trong bộ tản nhiệt của động cơ nhiệt, một trong những lí do là vì dầu cách điện còn nước dẫn điện sẽ gây mất an toàn điện.", true, "Dầu có tính cách điện tốt."],
+                     ["d) Để làm nóng 1 miếng sắt và 1 miếng nhôm có cùng khối lượng đến một nhiệt độ như nhau sẽ tổn thời gian như nhau, chứng tỏ nhiệt lượng cần cung cấp như nhau.", false, "Nhiệt dung riêng khác nhau nên thời gian khác nhau."]]},
+                {q: "Người ta cung cấp nhiệt lượng Q để làm nóng chảy hoàn toàn 100 g nước đá ở -20°C. Biết nhiệt nóng chảy riêng của nước đá là 3,34.10^5 J/kg, nhiệt dung riêng của nước đá là 2,1.10^3 J/(kg.K) và nhiệt dung riêng của nước là 4,2.10^3 J/(kg.K).",
+                 s: [["a) Nhiệt lượng tối thiểu cần cung cấp để làm nóng chảy hoàn toàn 100 g nước đá ở -20°C cho đến khi nước bắt đầu sôi là 79600 J.", true, "Q = 4200 + 33400 + 42000 = 79600 J."],
+                     ["b) Trong quá trình nóng chảy của nước đá nhiệt độ của nước đá không thay đổi bằng 0°C và nội năng giảm.", false, "Nội năng <b>tăng</b>."],
                      ["c) Nhiệt lượng tối thiểu cần cung cấp để làm nóng chảy hoàn toàn 100 g nước đá từ -20°C là 37600 J.", true, "4200 + 33400 = 37600 J."],
                      ["d) Nhiệt lượng tối thiểu cần cung cấp để làm tăng nhiệt độ của 100 g nước đá từ -20°C lên 0°C là 4200 J.", true, "Q = 0,1 × 2100 × 20 = 4200 J."]]},
-                {q: "Một nhiệt lượng kế bằng đồng thau khối lượng 128 gam chứa 210 gam nước ở nhiệt độ 8,4°C... thả miếng kim loại 192 gam nung nóng tới 100°C... cân bằng ở 21,5°C.",
+                {q: "Một nhiệt lượng kế bằng đồng thau khối lượng 128 gam chứa 210 gam nước ở nhiệt độ 8,4°C. Người ta thả một miếng kim loại khối lượng 192 gam đã nung nóng tới 100°C vào nhiệt lượng kế. Nhiệt độ khi bắt đầu có sự cân bằng nhiệt là 21,5°C. Cho nhiệt dung riêng của nước là 4,18.10^3 J/kg.K, của đồng thau là 0,128.10^3 J/kg.K.",
                  s: [["a) Nhiệt dung riêng của chất làm miếng kim loại là 777,2 J/kg.K", true, "Giải phương trình được c ≈ 777,2 J/kg.K."],
                      ["b) Khi thả miếng kim loại vào nhiệt lượng kế thì nhiệt lượng kế và nước thu nhiệt.", true, "Có nhiệt độ thấp hơn nên thu nhiệt."],
                      ["c) Khi thả miếng kim loại vào nhiệt lượng kế thì miếng kim loại toả nhiệt.", true, "Có nhiệt độ cao hơn nên tỏa nhiệt."],
                      ["d) Phương trình cân bằng nhiệt của hệ là Qthu = Qthu đồng + Qthu nước = Qtoa kim loại, (với Q>0).", true, "Q_tỏa = Q_thu."]]}
             ],
             sa: [
-                {q: "Thả rơi tự do một mảnh thép từ độ cao 500 m, khi tới mặt đất nó có vận tốc 50 m/s. Mảnh thép đã nóng lên bao nhiêu độ C?", a: "8.15",
+                {q: "Trong một thí nghiệm, người ta thả rơi tự do một mảnh thép từ độ cao 500 m, khi tới mặt đất nó có vận tốc 50 m/s. Mảnh thép đã nóng lên bao nhiêu độ (C) khi chạm đất, nếu cho rằng toàn bộ công cản của không khí chỉ dùng để làm nóng mảnh thép? Cho biết nhiệt dung riêng của thép là 460 J/kg.K và lấy g = 10 m/s². (làm tròn đến chữ số thập phân phần trăm).", a: "8.15",
                  tt: "h = 500 m; v = 50 m/s<br>g = 10; c = 460",
                  ct: "<code>Δt = (gh − v²/2)/c</code>",
                  gt: "<ul><li><code>h</code> độ cao rơi (m)</li><li><code>v</code> vận tốc chạm đất (m/s)</li><li><code>g</code> gia tốc trọng trường (m/s²)</li><li><code>c</code> nhiệt dung riêng của thép (J/kg.K)</li></ul>",
                  sol: "Δt = (5000 − 1250)/460 ≈ <b>8,15°C</b>."},
-                {q: "Nhiệt độ ngoài trời là -20°C. Hai phút sau, nhiệt độ ngoài trời tăng lên đến 7,2°C. Xác định độ tăng nhiệt độ trung bình trong 2 phút đó theo đơn vị Kelvin/giây.", a: "0.23",
+                {q: "Thế giới từng ghi nhận sự thay đổi nhiệt độ rất lớn diễn ra ở Spearfish, South Dakota vào ngày 22/01/1943. Lúc 7h30 sáng, nhiệt độ ngoài trời là -20°C. Hai phút sau, nhiệt độ ngoài trời tăng lên đến 7,2°C. Xác định độ tăng nhiệt độ trung bình trong 2 phút đó theo đơn vị Kelvin/giây (làm tròn đến chữ số thập phân phần trăm).", a: "0.23",
                  tt: "t₁ = −20°C; t₂ = 7,2°C<br>Δt = 120 s",
                  ct: "<code>ΔT = t₂ − t₁; Tốc độ = ΔT/Δt</code>",
                  gt: "<ul><li><code>ΔT</code> độ tăng nhiệt độ (K, tương đương °C)</li><li><code>Δt</code> khoảng thời gian (s)</li></ul>",
                  sol: "ΔT = 27,2 K → Tốc độ = 27,2/120 ≈ <b>0,23 K/s</b>."},
-                {q: "Người ta truyền cho khí trong xilanh nhiệt lượng 120 J. Khí nở ra thực hiện công 80 J đẩy pit-tông lên. Độ biến thiên nội năng của khí là bao nhiêu Jun?", a: "40",
+                {q: "Người ta truyền cho khí trong xilanh nhiệt lượng 120 J. Khí nở ra thực hiện công 80 J đẩy pit-tông lên. Độ biến thiên nội năng của khí là bao nhiêu Jun ?", a: "40",
                  tt: "Q = 120 J; A = −80 J",
                  ct: "<code>ΔU = Q + A</code>",
                  gt: "<ul><li><code>ΔU</code> độ biến thiên nội năng (J)</li><li><code>Q</code> nhiệt lượng (J) — Q > 0 nhận nhiệt</li><li><code>A</code> công (J) — A < 0 sinh công</li></ul>",
@@ -1195,9 +1313,9 @@
                  sol: "Nung sắt là quá trình <b>truyền nhiệt</b>."},
                 {q: "Cho hai vật có nhiệt độ khác nhau tiếp xúc với nhau. Nhiệt được truyền từ vật nào sang vật nào?", o: ["Từ vật có nhiệt năng lớn hơn sang vật có nhiệt năng nhỏ hơn.", "Từ vật ở trên cao sang vật ở dưới thấp.", "Từ vật có nhiệt độ cao hơn sang vật có nhiệt độ thấp hơn.", "Từ vật có khối lượng lớn hơn sang vật có khối lượng nhỏ hơn."], a: "C",
                  sol: "Nhiệt truyền từ vật có <b>nhiệt độ cao hơn</b> sang vật có <b>nhiệt độ thấp hơn</b>."},
-                {q: "Khi nấu ăn... đến lúc sôi cần chính lửa nhỏ lại bởi vì", o: ["để lửa nhỏ sẽ vẫn giữ cho trong nồi có nhiệt độ ổn định bằng nhiệt độ sôi của nước.", "lúc này cần làm cho nước trong nồi không bị sôi và hóa hơi.", "lúc này để lửa nhỏ vì cần giảm nhiệt độ trong nồi xuống.", "để lửa to làm cho nhiệt độ trong nồi tăng nhanh sẽ làm hỏng đồ nấu trong nồi."], a: "A",
+                {q: "Khi nấu ăn những món như: luộc, ninh, nấu cơm, ... đến lúc sôi cần chính lửa nhỏ lại bởi vì", o: ["để lửa nhỏ sẽ vẫn giữ cho trong nồi có nhiệt độ ổn định bằng nhiệt độ sôi của nước.", "lúc này cần làm cho nước trong nồi không bị sôi và hóa hơi.", "lúc này để lửa nhỏ vì cần giảm nhiệt độ trong nồi xuống.", "để lửa to làm cho nhiệt độ trong nồi tăng nhanh sẽ làm hỏng đồ nấu trong nồi."], a: "A",
                  sol: "Khi nước đã sôi, nhiệt độ không tăng thêm dù lửa to."},
-                {q: "Trong một chiếc ấm có 300 g nước. Đun nước tới nhiệt độ sôi... Nhiệt lượng cần thiết để làm 100 gam nước hóa thành hơi là", o: ["320 kJ", "460 kJ", "690 kJ", "230 kJ"], a: "D",
+                {q: "Trong một chiếc ấm có 300 g nước. Đun nước tới nhiệt độ sôi dưới áp suất khí quyển bằng 1 atm. Cho nhiệt hóa hơi riêng của nước là 2,3.10^6 J/kg. Nhiệt lượng cần thiết để làm 100 gam nước hóa thành hơi là", o: ["320 kJ", "460 kJ", "690 kJ", "230 kJ"], a: "D",
                  tt: "m = 0,1 kg<br>L = 2,3.10⁶ J/kg",
                  ct: "<code>Q = m.L</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng hóa hơi (J)</li><li><code>m</code> khối lượng nước hóa hơi (kg)</li><li><code>L</code> nhiệt hóa hơi riêng của nước (J/kg)</li></ul>",
@@ -1206,15 +1324,15 @@
                  sol: "Nhiệt độ không đổi nhưng vật nhận nhiệt nên <b>nội năng tăng lên</b>."},
                 {q: "Đơn vị đo nhiệt độ trong hệ đo lường SI là", o: ["Fahrenheit (°F).", "Kelvin (K).", "Cả 3 đơn vị trên.", "Celsius (°C)."], a: "B",
                  sol: "Đơn vị chuẩn trong hệ SI là <b>Kelvin (K)</b>."},
-                {q: "Cồn y tế chuyển từ thể lỏng sang thể khí rất nhanh... Khi xoa cồn vào da, ta cảm thấy lạnh ở vùng da đó vì cồn", o: ["thu nhiệt lượng từ cơ thể qua chỗ da đó để bay hơi.", "khi bay hơi tạo ra dòng nước mất tại chỗ da đó.", "khi bay hơi tỏa nhiệt lượng vào chỗ da đó.", "khi bay hơi kéo theo lượng nước chỗ da đó ra khỏi cơ thể."], a: "A",
+                {q: "Cồn y tế chuyển từ thể lỏng sang thể khí rất nhanh ở điều kiện thông thường. Khi xoa cồn vào da, ta cảm thấy lạnh ở vùng da đó vì cồn", o: ["thu nhiệt lượng từ cơ thể qua chỗ da đó để bay hơi.", "khi bay hơi tạo ra dòng nước mất tại chỗ da đó.", "khi bay hơi tỏa nhiệt lượng vào chỗ da đó.", "khi bay hơi kéo theo lượng nước chỗ da đó ra khỏi cơ thể."], a: "A",
                  sol: "Sự bay hơi thu nhiệt. Cồn bay hơi <b>thu nhiệt từ da</b>."},
                 {q: "Nhiệt lượng mà vật thu vào hay tỏa ra không phụ thuộc vào", o: ["khối lượng của vật.", "độ tăng nhiệt độ của vật.", "hình dạng của vật.", "nhiệt dung riêng của chất làm nên vật."], a: "C",
                  sol: "Q = m.c.Δt → không phụ thuộc <b>hình dạng</b>."},
-                {q: "Một nhiệt lượng kế bằng thau có khối lượng 300 g đựng 500 g nước. Một khối nước đá khối lượng 200 g nổi trên mặt nước. Tất cả ở 0°C. Cho nhiệt lượng kế một thỏi nhôm khối lượng 100 g ở 100°C. Tính khối lượng nước đá tan thành nước.", o: ["46,12 g.", "28 g.", "25,88 g.", "10 g."], a: "A",
+                {q: "Một nhiệt lượng kế bằng thau có khối lượng 300 g đựng 500 g nước. Một khối nước đá khối lượng 200 g nổi trên mặt nước. Tất cả ở 0°C. Cho nhiệt lượng kế một thỏi nhôm khối lượng 100 g ở 100°C. Tính khối lượng nước đá tan thành nước. Cho nhiệt dung riêng của thau, nhôm là c1=380J/kg.K; c2=880J/kg.K, nhiệt nóng chảy của nước đá là λ=3,4.10^5 J/kg.", o: ["46,12 g.", "28 g.", "25,88 g.", "10 g."], a: "A",
                  tt: "m_Al = 0,1 kg; t = 100°C<br>c_Al = 880; hệ ở 0°C<br>λ = 3,4.10⁵ J/kg",
                  ct: "<code>Q_Al tỏa = m_tan.λ</code>",
                  gt: "<ul><li><code>Q_Al</code> nhiệt lượng nhôm tỏa (J)</li><li><code>m_tan</code> khối lượng đá tan (kg)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li></ul>",
-                 sol: "• Q_Al = 8800 J<br>• m_tan ≈ 0,02588 kg = <b>25,88 g</b>"},
+                 sol: "• Q_Al = 0,1.880.100 = 8800 J<br>• m_tan = 8800 / 3,4.10⁵ ≈ 0,02588 kg = <b>25,88 g</b> (Lưu ý: Đáp án trong đề gốc là 46.12g có thể do lỗi in ấn, nhưng đáp án tính toán chính xác là 25,88g)"},
                 {q: "Tính chất nào sau đây không phải là của nguyên tử, phân tử?", o: ["Chuyển động càng nhanh thì nhiệt độ càng cao.", "Có lúc chuyển động, có lúc đứng yên.", "Giữa các nguyên tử, phân tử có khoảng cách.", "Chuyển động không ngừng."], a: "B",
                  sol: "Các phân tử luôn <b>chuyển động không ngừng</b>."},
                 {q: "Một vật có nhiệt độ ban đầu là 27°C, sau đó tăng thêm 20°C. Theo thang nhiệt Kelvin, nhiệt độ lúc sau của của vật đó là", o: ["300 K.", "320 K.", "20 K.", "593 K."], a: "B",
@@ -1224,7 +1342,7 @@
                  sol: "t₂ = 47°C → T = <b>320 K</b>"},
                 {q: "Để m(kg) nước đá nóng chảy hoàn toàn thì cần một nhiệt lượng Q. Biết rằng nhiệt nóng chảy riêng của nước đá là λ(J/kg). Hệ thức đúng là", o: ["Q = λm", "Q = m/λ", "Q = λ/m", "m = Qλ"], a: "A",
                  sol: "Công thức: <b>Q = λ.m</b>."},
-                {q: "Nội năng của một vật là", o: ["nhiệt lượng mà vật nhận được trong quá trình truyền nhiệt.", "tổng nhiệt lượng và cơ năng mà vật nhận được...", "tổng động năng và thể năng của vật.", "tổng động năng và thể năng của các phân tử cấu tạo nên vật."], a: "D",
+                {q: "Nội năng của một vật là", o: ["nhiệt lượng mà vật nhận được trong quá trình truyền nhiệt.", "tổng nhiệt lượng và cơ năng mà vật nhận được trong quá truyền nhiệt và thực hiện công.", "tổng động năng và thể năng của vật.", "tổng động năng và thể năng của các phân tử cấu tạo nên vật."], a: "D",
                  sol: "Là tổng <b>động năng và thế năng của các phân tử</b>."},
                 {q: "Biết nhiệt nóng chảy của nước đá là 34.10³J/kg. Nhiệt lượng cần cung cấp để làm nóng chảy hoàn toàn một cục nước đá có khối lượng 400 gam ở 0⁰C là", o: ["136.10³J", "273.10³J", "36.10³J", "68.10³J"], a: "A",
                  tt: "m = 0,4 kg<br>λ = 34.10³ J/kg",
@@ -1242,21 +1360,21 @@
                  sol: "Đo <b>thân nhiệt của người</b>."},
                 {q: "Nhiệt dung riêng của nước là 4200 J/kg.K cho biết điều gì?", o: ["Muốn làm cho 1 kg nước nóng thêm 1⁰C cần truyền cho nước một nhiệt lượng là 4200 J.", "Muốn làm cho 1 kg nước nóng thêm 1⁰C cần truyền cho nước một nhiệt lượng là 420 J.", "Muốn làm cho 10 kg nước nóng thêm 1⁰C cần truyền cho nước một nhiệt lượng là 4200 J.", "Muốn làm cho 1 g nước nóng thêm 1⁰C cần truyền cho nước một nhiệt lượng là 4200 J."], a: "A",
                  sol: "Định nghĩa nhiệt dung riêng."},
-                {q: "Trong quá trình chất khí nhận nhiệt và sinh công thì Q và A trong hệ thức ΔU = Q + A...", o: ["Q < 0 và A > 0.", "Q < 0 và A < 0", "Q > 0 và A < 0.", "Q > 0 và A > 0."], a: "C",
+                {q: "Trong quá trình chất khí nhận nhiệt và sinh công thì Q và A trong hệ thức ΔU = Q + A phải có giá trị nào sau đây?", o: ["Q < 0 và A > 0.", "Q < 0 và A < 0", "Q > 0 và A < 0.", "Q > 0 và A > 0."], a: "C",
                  sol: "Q > 0 (nhận nhiệt), A < 0 (sinh công)."}
             ],
             tf: [
-                {q: "Một học sinh làm thí nghiệm đun nóng 0,2 kg nước đá ở 0°C chuyển hoàn toàn thành hơi nước ở 100°C...",
-                 s: [["a) Nhiệt lượng làm 0,2 kg nước đá... thành hơi nước ở 100°C là 602800J.", true, "66800 + 84000 + 452000 = 602800 J."],
-                     ["b) Nhiệt lượng cần thiết để đưa 0,2kg nước từ 0°C đến 100°C là 86kJ.", false, "Q = 84 kJ."],
-                     ["c) Nhiệt lượng cần thiết để làm hóa hơi hoàn toàn 0,2 kg nước 100°C là 42,5kJ.", false, "Q = 452 kJ."],
+                {q: "Một học sinh làm thí nghiệm đun nóng 0,2 kg nước đá (thể rắn) ở 0⁰C chuyển hoàn toàn thành hơi nước ở 100⁰C. Cho nhiệt nóng chảy riêng của nước ở 0⁰C là 3,34.10⁵ J/kg, nhiệt dung riêng của nước là 4,200J/kg.K và nhiệt hóa hơi riêng của nước ở 100⁰C là 2,26.10⁶ J/kg. Bỏ qua hao phí tỏa nhiệt ra môi trường.",
+                 s: [["a) Nhiệt lượng làm 0,2 kg nước đá ở thể rắn ở 0⁰C chuyển hóa thành hơi nước ở 100⁰C là 602800J.", true, "66800 + 84000 + 452000 = 602800 J."],
+                     ["b) Nhiệt lượng cần thiết để đưa 0,2kg nước từ 0⁰C đến 100⁰C là 86kJ.", false, "Q = 84 kJ."],
+                     ["c) Nhiệt lượng cần thiết để làm hóa hơi hoàn toàn 0,2 kg nước 100⁰C là 42,5kJ.", false, "Q = 452 kJ."],
                      ["d) Nhiệt lượng cần thiết để làm nóng chảy hoàn toàn 0,2kg nước đá tại nhiệt độ nóng chảy là 68,6kJ.", false, "Q = 66,8 kJ."]]},
-                {q: "Một thùng chứa 5 kg nước đá ở -10°C. c = 2100 J/kg.K, λ = 3,4.10⁵ J/kg.",
+                {q: "Một thùng chứa 5 kg nước đá ở -10⁰C. Cho biết nhiệt dung riêng của nước đá là 2100 J/kg.K, nhiệt nóng chảy riêng của nước đá là 3,4.10⁵ J/kg.",
                  s: [["a) Nhiệt lượng để nước đá tan hoàn hoàn là 1,805.10⁶ J", true, "105000 + 1700000 = 1.805.000 J."],
-                     ["b) Nhiệt lượng làm 1kg nước đá tăng thêm 1°C là 3,4.10⁵J.", false, "Đó là nhiệt nóng chảy. Tăng 1°C là m.c = 2100 J."],
-                     ["c) Nước đá nóng chảy ở nhiệt độ 100°C.", false, "Nóng chảy ở 0°C."],
+                     ["b) Nhiệt lượng làm 1kg nước đá tăng thêm 1⁰C là 3,4.10⁵J.", false, "Đó là nhiệt nóng chảy. Tăng 1⁰C là m.c = 2100 J."],
+                     ["c) Nước đá nóng chảy ở nhiệt độ 100⁰C.", false, "Nóng chảy ở 0⁰C."],
                      ["d) Nhiệt lượng làm 1kg nước đá nóng chảy là 1,7.10⁶ J.", false, "Q = 3,4.10⁵ J."]]},
-                {q: "Chọn câu đúng hoặc sai trong các hiện tượng dưới đây:",
+                {q: "Chọn câu đúng hoặc sai trong các hiện tượng dưới đây",
                  s: [["a) Hiện tượng nước đông bằng vào mùa đông là sự đông đặc", true, "Lỏng → Rắn là đông đặc."],
                      ["b) Phơi quần áo dưới ánh ảng mặt trời là ứng dụng của sự ngưng tụ.", false, "Là ứng dụng của sự bay hơi."],
                      ["c) Hiện tượng có hạt sương đọng trên lá cây vào sáng sớm là sự nóng chảy.", false, "Là sự ngưng tụ."],
@@ -1268,32 +1386,32 @@
                      ["d) Người ta thực hiện công lên khối khí nên khối khí nhận công.", true, "Nén khí là thực hiện công lên khí."]]}
             ],
             sa: [
-                {q: "Cần một nhiệt lượng bao nhiêu MJ để làm 2 kg nước đá ở nhiệt độ 0°C tan hoàn hoàn, biết λ = 3,4.10^5 J/kg?", a: "0.68",
+                {q: "Cần một nhiệt lượng bao nhiêu MJ để làm 2 kg nước đá ở nhiệt độ 0°C tan hoàn hoàn, biết nhiệt nóng chảy riêng của nước đá là 3,4.10^5 J/kg. ( Kết quả làm tròn lấy 2 chữ số thập phân sau dấu phẩy )", a: "0.68",
                  tt: "m = 2 kg<br>λ = 3,4.10⁵ J/kg<br>t = 0°C",
                  ct: "<code>Q = m.λ</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng (J)</li><li><code>m</code> khối lượng (kg)</li><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li></ul>",
                  sol: "Q = 680 000 J = <b>0,68 MJ</b>."},
-                {q: "Nhiệt kế hồng ngoại đo nhiệt độ cơ thể khi đó là 36,5°C. Bước sóng hồng ngoại do cơ thể người phát ra là bao nhiêu µm?", a: "9.4",
+                {q: "Sự phụ thuộc vào nhiệt độ của bước sóng điện từ theo hệ thức Wien: T.λ_max = 2900(µm.K) được dùng vào việc chế tạo các nhiệt kế thường dùng hằng ngày như nhiệt kế hồng ngoại, cũng như các nhiệt kế trong thang vận để đo nhiệt độ bề mặt của các thiên thể. Dùng một nhiệt kế hồng ngoại để đo nhiệt độ cơ thể người khi đó là 36,5°C. Bước sóng hồng ngoại do cơ thể người phát ra bằng xấp xỉ bằng bao nhiêu µm? (Kết quả làm tròn lấy một số thập phân sau dấu phẩy)", a: "9.4",
                  tt: "t = 36,5°C → T = 309,5 K<br>b = 2900 µm.K",
                  ct: "<code>λ_max = b/T</code>",
                  gt: "<ul><li><code>λ_max</code> bước sóng cực đại (µm)</li><li><code>b</code> hằng số Wien (µm.K)</li><li><code>T</code> nhiệt độ tuyệt đối (K)</li></ul>",
                  sol: "λ_max = 2900/309,5 ≈ <b>9,4 µm</b>."},
-                {q: "Người ta cung cấp nhiệt lượng 2 J cho chất khí đựng trong xilanh... pit-tông di chuyển đều 5 cm. Lực ma sát là 10 N. Độ biến thiên nội năng là bao nhiêu J?", a: "1.5",
+                {q: "Người ta cung cấp nhiệt lượng 2 J cho chất khí đựng trong một xilanh đặt nằm ngang. Chất khí nở ra, đẩy pit tong đi một đoạn 5 cm. Biết lực ma sát giữa pittong và xilanh có độ lớn 10 N. Hỏi nội năng của khí biến thiên một lượng là bao nhiêu J? ( Kết quả làm tròn lấy 1 số thập phân sau dấu phẩy)", a: "1.5",
                  tt: "Q = 2 J<br>F = 10 N; s = 0,05 m",
                  ct: "<code>A = −F.s; ΔU = Q + A</code>",
                  gt: "<ul><li><code>Q</code> nhiệt lượng (J)</li><li><code>A</code> công cản (J)</li><li><code>F</code> lực (N)</li><li><code>s</code> quãng đường (m)</li><li><code>ΔU</code> độ biến thiên nội năng (J)</li></ul>",
                  sol: "A = −0,5 J → ΔU = <b>1,5 J</b>."},
-                {q: "Trong thí nghiệm đo nhiệt nóng chảy riêng của nước đá, dùng 0,6 kg nước đá. Oát kế đo được 930 W trong 220s. Hao phí 3%. Nhiệt nóng chảy riêng đo được là bao nhiêu J/g?", a: "330",
+                {q: "Trong thí nghiệm đo nhiệt nóng chảy riêng của nước đá, người ta sử dụng 0,6 kg nước đá. Oát kế đo được là 930 W trong thời gian 220s. Cho rằng nhiệt lượng hao phí tỏa ra môi trường bên ngoài bằng 3% điện năng tiêu thụ của hệ thống. Nhiệt nóng chảy riêng của nước đá do được bằng bao nhiêu J/g? (Kết quả làm tròn đến chữ số hàng đơn vị)", a: "330",
                  tt: "m = 0,6 kg<br>P = 930 W; t = 220 s<br>H = 97%",
                  ct: "<code>λ = P.t.H/m</code>",
                  gt: "<ul><li><code>λ</code> nhiệt nóng chảy riêng (J/kg)</li><li><code>P</code> công suất (W)</li><li><code>t</code> thời gian (s)</li><li><code>H</code> hiệu suất</li></ul>",
                  sol: "• Q_tp = 204 600 J<br>• Q_ích = 198 462 J<br>• λ ≈ <b>330 J/g</b>"},
-                {q: "Một bình nhôm khối lượng 0,5 kg đựng 2 kg nước ở 20°C. Thả vào bình một thỏi đồng khối lượng 200 g lấy ra từ bếp lò. Cân bằng nhiệt là 21,2°C. Nhiệt độ của bếp lò là bao nhiêu °C?", a: "160",
+                {q: "Một bình nhôm khối lượng 0,5 kg đựng 2 kg nước ở 20°C. Thả vào bình một thỏi đồng khối lượng 200 g lấy ra từ bếp lò. Khi hệ xảy ra cân bằng thì nhiệt độ của nước là 21,2°C. Biết nhiệt dung riêng của nhôm, nước và đồng lần lượt là 880J/kg.K; 4200J/kg.K và 380J/kg.K. Bỏ qua sự tỏa nhiệt ra môi trường. Nhiệt độ của bếp lò là bao nhiêu °C (Kết quả làm tròn đến hàng đơn vị)", a: "160",
                  tt: "m_Al = 0,5 kg; c = 880<br>m_n = 2 kg; c = 4200<br>m_Cu = 0,2 kg; c = 380<br>t₁ = 20°C; t_cb = 21,2°C",
                  ct: "<code>Q_thu = Q_tỏa</code>",
                  gt: "<ul><li><code>Q_thu</code> nhiệt lượng bình + nước thu (J)</li><li><code>Q_tỏa</code> nhiệt lượng thỏi đồng tỏa (J)</li><li><code>t_x</code> nhiệt độ bếp lò cần tìm (°C)</li></ul>",
                  sol: "• Q_thu = 10 608 J<br>• Q_tỏa = 76.(t_x − 21,2)<br>• t_x ≈ <b>160°C</b>"},
-                {q: "Cung cấp 1000 J nhiệt lượng cho một vật có khối lượng 300 g thì nhiệt độ của vật này tăng từ 25°C đến 45°C. Nhiệt dung riêng của vật đó là bao nhiêu J/kg.K?", a: "167",
+                {q: "Cung cấp 1000 J nhiệt lượng cho một vật có khối lượng 300 g thì nhiệt độ của vật này tăng từ 25°C đến 45°C. Nhiệt dung riêng của vật đó là bao nhiêu J/kg.K? (Kết quả làm tròn đến chữ số hàng đơn vị).", a: "167",
                  tt: "Q = 1000 J<br>m = 0,3 kg; Δt = 20°C",
                  ct: "<code>c = Q/(m.Δt)</code>",
                  gt: "<ul><li><code>c</code> nhiệt dung riêng (J/kg.K)</li><li><code>Q</code> nhiệt lượng (J)</li><li><code>m</code> khối lượng (kg)</li><li><code>Δt</code> độ tăng nhiệt độ (°C)</li></ul>",
@@ -1355,7 +1473,6 @@
             });
             examHTML += `</div>`;
             
-            // Thêm nút Xem giải và khối giải
             examHTML += generateSolutionHTML(q);
             
             examHTML += `</div>`;
@@ -1440,7 +1557,6 @@
                         const correctLabel = question.querySelector(`input[value="${correctAnswer}"]`).closest('label');
                         if (correctLabel) correctLabel.classList.add('correct');
                     }
-                    // Hiện nút Xem giải, không hiện giải ngay
                     toggleBtn.style.display = 'inline-flex';
                 }, 650);
             });
@@ -1462,7 +1578,6 @@
             button.classList.add('selected-incorrect');
             statement.querySelector(isCorrect ? '.btn-true' : '.btn-false').classList.add('highlight-correct');
         }
-        // Hiện nút Xem giải
         toggleBtn.style.display = 'inline-flex';
     }
 
@@ -1492,8 +1607,44 @@
             resultSpan.classList.add('incorrect');
             input.style.borderColor = "#ef4444";
         }
-        // Hiện nút Xem giải
         toggleBtn.style.display = 'inline-flex';
+    }
+
+    // XỬ LÝ MODAL PHÓNG TO
+    function openModal(element) {
+        let contentToClone = element.querySelector('svg');
+        if (!contentToClone) {
+            contentToClone = element.querySelector('table');
+        }
+        
+        if (!contentToClone) return;
+
+        const container = document.getElementById('modal-svg-container');
+        const clonedContent = contentToClone.cloneNode(true);
+        
+        if (clonedContent.tagName === 'svg') {
+            clonedContent.style.width = '100%';
+            clonedContent.style.maxWidth = '900px';
+            clonedContent.style.height = 'auto';
+        } else if (clonedContent.tagName === 'table') {
+            clonedContent.style.width = '100%';
+            clonedContent.style.maxWidth = '900px';
+            clonedContent.style.fontSize = '1.2rem';
+        }
+
+        container.innerHTML = '';
+        container.appendChild(clonedContent);
+
+        document.getElementById('image-modal').classList.add('active');
+    }
+
+    function closeModal(event) {
+        if (event.target.id === 'image-modal' || event.target.id === 'image-modal-close') {
+            document.getElementById('image-modal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('modal-svg-container').innerHTML = '';
+            }, 300);
+        }
     }
 </script>
 
